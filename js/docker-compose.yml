@@ -1,0 +1,43 @@
+version: "3.2"
+services:
+    web:
+        image: nginx:latest
+        ports:
+            - 80:80
+        volumes:
+            - ./logs:/var/log/app
+            - "/Users/radams/sites/tasks:/app/tasks"
+            - "./site.conf:/etc/nginx/conf.d/site.conf"
+        links:
+            - php
+
+    php:
+        build: php-fpm
+        volumes:
+            - "/Users/radams/sites/tasks:/app/tasks"
+            - ./logs:/var/log/app
+        links:
+            - db
+
+    db:
+        image: mariadb:latest
+        ports:
+            - 3310:3306
+        volumes:
+            - type: volume
+              source: vol_tasks_db
+              target: /var/lib/mysql
+              volume:
+                nocopy: true
+        environment:
+            - MYSQL_ROOT_PASSWORD=magic
+
+volumes:
+    vol_tasks_db:
+        external: true
+
+#volumes:
+#    - new_lword_db:
+#    - logs:./logs
+#    - app:/Users/radams/code/lword
+
